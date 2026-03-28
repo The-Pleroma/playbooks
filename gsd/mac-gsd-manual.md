@@ -17,7 +17,7 @@ Works on Every Claude Tier:
 
 - [Part 1: What You Need to Know Before You Start](#part-1-what-you-need-to-know-before-you-start)
 - [Part 2: Understanding Claude's Subscription Tiers](#part-2-understanding-claudes-subscription-tiers)
-- [Part 3: Setting Up Your Mac](#part-3-setting-up-your-mac)
+- [Part 3: Setting Up Your Mac](#part-3-setting-up-your-mac) (includes GitHub setup)
 - [Part 4: Installing and Using Warp Terminal](#part-4-installing-and-using-warp-terminal)
 - [Part 5: Installing Claude Code](#part-5-installing-claude-code)
 - [Part 6: Skills, Plugins, and MCPs — Extending Claude Code](#part-6-skills-plugins-and-mcps--extending-claude-code)
@@ -214,6 +214,96 @@ brew install git
 > **CHECKPOINT**
 >
 > At this point you should have: Homebrew installed and working, Node.js version 18+, npm installed, and Git installed. If any of these are not working, do not proceed — the remaining tools depend on them.
+
+### Step 5: Set Up GitHub (Recommended)
+
+GitHub is a free online service that stores your code in the cloud. Think of it as Google Drive for code — it backs up your work, lets you collaborate with others, and gives you a complete history of every change you have ever made. GSD works fine without it, but once you have more than one project, GitHub becomes essential for keeping everything safe and organized.
+
+You do not need GitHub to start using GSD. You can skip this step and come back to it later. But if you are working on anything you would be upset to lose, set it up now.
+
+#### Create a GitHub Account
+
+1. Go to https://github.com and click **Sign up**
+2. Use your real email address — this is how your commits (saved changes) get linked to your profile
+3. Pick a username you are comfortable with — it will be visible on your repos
+4. Free tier is all you need
+
+#### Install the GitHub CLI
+
+The GitHub CLI (`gh`) lets you create repos, push code, and manage everything from Warp without opening a browser. Install it:
+
+```bash
+brew install gh
+```
+
+#### Authenticate
+
+```bash
+gh auth login
+```
+
+It will ask you a few questions. Pick these:
+
+1. **GitHub.com** (not Enterprise)
+2. **HTTPS** (simpler than SSH)
+3. **Login with a web browser**
+
+It gives you a one-time code, opens your browser, you paste the code, done. You only do this once — it stays authenticated across all your projects.
+
+#### Set Your Identity
+
+Tell Git who you are so your commits show your name and email:
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your-email@example.com"
+```
+
+Use the same email you signed up to GitHub with.
+
+#### Create Your First Repository
+
+Once you have a project you want to back up, navigate to its folder in Warp and run:
+
+```bash
+gh repo create your-username/your-project-name --private --source . --remote origin
+```
+
+This creates a private repo on GitHub, links it to your local project, and sets it as the remote. Then push your code:
+
+```bash
+git push -u origin main
+```
+
+That is it — your code is now backed up on GitHub. After this, GSD's automatic commits will stay local until you push. To push new work up to GitHub at any point:
+
+```bash
+git push
+```
+
+#### Public vs Private Repos
+
+- **Private** — only you can see it. Use for anything with API keys, business logic, or code you are not ready to share.
+- **Public** — anyone can see it. Use for open source projects, shared manuals, or things you want to showcase.
+
+You can change a repo from private to public (or vice versa) at any time in GitHub's settings.
+
+#### Organizations (Optional)
+
+If you are working with a team or want a shared space for documentation:
+
+1. Go to https://github.com → click your profile icon → **Your organizations** → **New organization**
+2. Free tier works fine
+3. Create repos under the org (e.g., `your-org/playbooks`) that all members can push to
+
+#### When to Push
+
+- **End of a work session** — back up your progress
+- **After completing a GSD phase** — natural checkpoint
+- **Before switching machines** — so you can pull on the other one
+- **Before any risky operation** — safety net
+
+You do not need to push after every single commit. GSD makes lots of small commits locally — push when you have reached a meaningful stopping point.
 
 ---
 
