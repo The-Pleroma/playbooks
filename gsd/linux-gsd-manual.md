@@ -63,7 +63,7 @@ Here is the relationship between the tools, in plain English:
 
 > **KEY CONCEPT: You Do Not Need to Code**
 >
-> GSD was built for non-coders. You describe what you want in plain English. The system asks you clarifying questions, creates a plan, then builds it piece by piece. Each piece gets tested and committed to version control (Git) automatically.
+> GSD was built for non-coders. You describe what you want in plain English. The system asks you clarifying questions, creates a plan, then builds it piece by piece. Each piece gets tested and automatically saved to a history log on your computer using a tool called Git (you will install Git in Part 3 — it keeps a complete record of every change so you can always undo mistakes).
 
 ### Prerequisites (What You Need)
 
@@ -166,7 +166,7 @@ sudo pacman -Syu
 
 ### Step 2: Install Git
 
-Git is version control software that tracks every change to your project. GSD relies on it heavily. Once Git is installed, you never need to run git commands manually — GSD handles all commits automatically as you build.
+Git is version control software that runs on your computer and tracks every change to your project files — like a detailed undo history that never expires. GSD relies on it heavily. Once Git is installed, you never need to run Git commands yourself — GSD handles saving your changes automatically as you build.
 
 **Ubuntu / Debian:**
 
@@ -232,7 +232,7 @@ You need Node.js version 18 or higher.
 
 ### Step 5: Set Up GitHub (Recommended)
 
-GitHub is a free online service that stores your code in the cloud. Think of it as Google Drive for code — it backs up your work, lets you collaborate with others, and gives you a complete history of every change you have ever made. GSD works fine without it, but once you have more than one project, GitHub becomes essential for keeping everything safe and organized.
+GitHub is a separate, free online service that stores a copy of your project in the cloud. It works on top of Git, the tool you installed earlier. Think of it this way: **Git** is the tool on your computer that saves every change you make. **GitHub** is a website where you upload those saved changes so they are backed up online and accessible from any computer. They are two different things with similar names — Git works without GitHub, but GitHub needs Git. GSD works fine without it, but once you have more than one project, GitHub becomes essential for keeping everything safe and organized.
 
 You do not need GitHub to start using GSD. You can skip this step and come back to it later. But if you are working on anything you would be upset to lose, set it up now.
 
@@ -283,16 +283,16 @@ It will ask you a few questions. Pick these:
 
 It gives you a one-time code, opens your browser, you paste the code, done. You only do this once — it stays authenticated across all your projects.
 
-#### Set Your Identity
+#### Set Your Git Identity (So GitHub Knows Who You Are)
 
-Tell Git who you are so your commits show your name and email:
+This step configures Git — the local tool on your computer — with your name and email. GitHub uses this information to label your contributions. Run these two commands, replacing the example values with your own:
 
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "your-email@example.com"
 ```
 
-Use the same email you signed up to GitHub with.
+Use the same email address you used when creating your GitHub account. This links your local Git saves to your GitHub profile.
 
 #### Create Your First Repository
 
@@ -302,7 +302,7 @@ Once you have a project you want to back up, navigate to its folder and run:
 gh repo create your-username/your-project-name --private --source . --remote origin
 ```
 
-This creates a private repo on GitHub, links it to your local project, and sets it as the remote. Then push your code:
+This creates a private repo on GitHub, links it to your local project, and sets it as the remote. Now "push" your code — this means uploading your locally saved changes from Git (on your computer) to GitHub (in the cloud):
 
 ```bash
 git push -u origin main
@@ -333,7 +333,7 @@ If you are working with a team or want a shared space for documentation:
 
 - **End of a work session** — back up your progress
 - **After completing a GSD phase** — natural checkpoint
-- **Before switching machines** — so you can pull on the other one
+- **Before switching machines** — so you can download your latest changes on the other computer (called "pulling")
 - **Before any risky operation** — safety net
 
 You do not need to push after every single commit. GSD makes lots of small commits locally — push when you have reached a meaningful stopping point.
@@ -787,7 +787,7 @@ mkdir ~/Developer/my-portfolio
 cd ~/Developer/my-portfolio
 ```
 
-Initialize a Git repository:
+Tell Git to start tracking this folder (this creates a hidden record of changes — called a "repository" — inside the folder):
 
 ```bash
 git init
@@ -987,9 +987,9 @@ git status
 If you see "fatal: not a git repository," you need to initialize one:
 
 ```bash
-git init
-git add .
-git commit -m "Initial commit: existing project files"
+git init                                        # Start tracking this folder (creates a "repository")
+git add .                                       # Stage all existing files (mark them to be saved)
+git commit -m "Initial commit: existing project files"  # Save a snapshot of all files with a label
 ```
 
 If `git status` shows information about your repository, Git is already set up and you can skip this step.
