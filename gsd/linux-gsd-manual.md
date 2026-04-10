@@ -1763,6 +1763,79 @@ Claude should begin the memory consolidation process and return a summary of wha
 
 ---
 
+### 13.3 Installing Impeccable Design Skills (21 Skills)
+
+#### What This Is
+
+A collection of 21 design-focused skills created by Paul Bakaus (pbakaus) that give Claude the ability to systematically audit and improve UI/UX quality. Instead of making vague "make it look better" requests, each skill targets a specific design dimension — typography, color, layout, animation, accessibility, and more. Think of them as a team of specialized design reviewers you can invoke by name.
+
+These skills were built for frontend work and are particularly effective when run in sequence after implementing a new feature. They catch design inconsistencies that generalist code review misses.
+
+#### The 21 Skills
+
+| Command | What It Does | When to Use |
+|---------|-------------|-------------|
+| `/typeset` | Fix font choices, hierarchy, sizing, weight, readability | Text looks inconsistent, fonts feel wrong |
+| `/arrange` | Fix layout, spacing, visual rhythm, grid balance | Spacing feels off, crowded UI, weak hierarchy |
+| `/colorize` | Add strategic color using 60/30/10 ratio | Design looks gray, dull, monochromatic |
+| `/polish` | Final quality pass — alignment, spacing, consistency | Pre-launch, "something feels off" |
+| `/normalize` | Align UI to design system tokens and patterns | Design drift, mismatched styles |
+| `/harden` | Add error handling, overflow, i18n, edge cases | Make it production-ready, handle edge cases |
+| `/animate` | Add purposeful animations and micro-interactions | Transitions feel abrupt, needs motion |
+| `/delight` | Add moments of joy, personality, unexpected touches | Functional but forgettable, needs personality |
+| `/overdrive` | Push past limits — shaders, spring physics, 60fps | Want to wow, go all-out, impress |
+| `/critique` | UX evaluation with scoring and persona testing | Want honest design assessment |
+| `/audit` | Technical checks — a11y, performance, responsive, anti-patterns | Want a scored quality report |
+| `/optimize` | Fix performance — loading, rendering, bundle size, images | Slow, laggy, janky |
+| `/adapt` | Make responsive across screen sizes and devices | Mobile layouts, breakpoints, viewport |
+| `/extract` | Pull reusable components into design system | Repeated patterns, component library |
+| `/distill` | Strip to essence, remove unnecessary complexity | Cluttered, too much going on |
+| `/clarify` | Fix unclear copy, labels, error messages, instructions | Confusing text, bad error messages |
+| `/bolder` | Amplify safe designs to be more visually impactful | Looks bland, generic, too safe |
+| `/quieter` | Tone down overstimulating or aggressive designs | Too loud, overwhelming, garish |
+| `/onboard` | Design first-run experiences and empty states | New user flows, activation |
+| `/frontend-design` | Build distinctive production-grade interfaces | Building new UI from scratch |
+| `/visual-preview` | Preview visual changes in external tools | Working with Figma, Luma, design tools |
+
+#### How to Install
+
+In Claude Code, type:
+
+```
+/install-plugin pbakaus/impeccable
+```
+
+Or manually:
+
+```bash
+cd /tmp
+git clone https://github.com/pbakaus/impeccable.git
+cp -r /tmp/impeccable/skills/* ~/.claude/skills/
+```
+
+Run `/teach-impeccable` once to gather your project's design context.
+
+#### How to Use Effectively
+
+A typical post-feature sequence:
+1. `/normalize` — align to design system first
+2. `/typeset` — fix type hierarchy
+3. `/arrange` — fix layout and spacing
+4. `/colorize` — fix color balance
+5. `/harden` — handle overflow, edge cases
+6. `/polish` — final pass
+
+For a full scored audit: `/audit`
+
+#### Source
+
+- **GitHub:** https://github.com/pbakaus/impeccable
+- **Author:** Paul Bakaus
+- **License:** Open source
+- **Installed:** April 2026
+
+---
+
 ## Quick Reference: All Commands at a Glance
 
 A single-page reference for every command you will use regularly. Bookmark this page.
@@ -1862,6 +1935,32 @@ A single-page reference for every command you will use regularly. Bookmark this 
 | `/vault-drift` | Surface recurring themes |
 | `/vault-emerge` | Find idea clusters ready to become projects |
 | `/vault-schedule` | Map priorities to time blocks |
+
+### Impeccable Design Skills (run inside Claude Code)
+
+| Command | What It Does |
+|---------|-------------|
+| `/typeset` | Fix font hierarchy, sizing, weight, readability |
+| `/arrange` | Fix layout, spacing, visual rhythm, grid balance |
+| `/colorize` | Add strategic color using 60/30/10 ratio |
+| `/polish` | Final quality pass — alignment, spacing, consistency |
+| `/normalize` | Align UI to design system tokens and patterns |
+| `/harden` | Error handling, overflow, i18n, edge cases |
+| `/animate` | Purposeful animations and micro-interactions |
+| `/delight` | Moments of joy, personality, unexpected touches |
+| `/overdrive` | Shaders, spring physics, 60fps — go all-out |
+| `/critique` | UX evaluation with scoring and persona testing |
+| `/audit` | Technical quality checks — a11y, perf, responsive |
+| `/optimize` | Fix loading speed, rendering, bundle size |
+| `/adapt` | Responsive design across screen sizes and devices |
+| `/extract` | Pull reusable components into design system |
+| `/distill` | Strip to essence, remove unnecessary complexity |
+| `/clarify` | Fix unclear copy, labels, error messages |
+| `/bolder` | Amplify safe designs for more visual impact |
+| `/quieter` | Tone down overstimulating designs |
+| `/onboard` | Design first-run experiences and empty states |
+| `/frontend-design` | Build distinctive production-grade interfaces |
+| `/visual-preview` | Preview visual changes in external tools |
 
 ### Additional Skills
 
