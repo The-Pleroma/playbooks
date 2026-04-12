@@ -1241,6 +1241,30 @@ A: Yes. Any code editor or text editor works fine for viewing the files Claude C
 **Q: What if I want to undo something the AI built?**
 A: GSD commits every task to Git individually. Use `git log --oneline` to find the commit you want to revert to, then use `git reset --hard [commit-hash]` to go back to that state.
 
+**Q: Claude keeps saying it did something but when I check, it didn't actually make the changes. What's going on?**
+A: This is a known behavior called "lazy completion" — Claude's system prompt has many instructions to be minimal and terse, which can cause it to shortcut work and report success without actually executing. Two fixes:
+
+1. **Disable Adaptive Thinking** — add this environment variable to your shell profile (`~/.bashrc` or `~/.zshrc`):
+```bash
+echo 'export claude_code_disable_adaptive_thinking=1' >> ~/.bashrc
+source ~/.bashrc
+```
+This prevents Claude from deciding "this is simple, I'll think less" and skipping work.
+
+2. **Set Effort to Max** — at the start of each session, type:
+```
+/effort max
+```
+This forces full reasoning depth on every request. More tokens used per response, but you get actual thoroughness.
+
+Both settings apply to the CLI. The environment variable also affects the desktop app if launched from your shell.
+
+**Q: How do I make Claude work harder and produce more thorough code?**
+A: Beyond the fixes above, you can also:
+- Add instructions to your global `~/.claude/CLAUDE.md` file (e.g., "Make BOLD changes using proven patterns rather than small incremental tweaks")
+- Use the two-pass rule: if an approach fails twice, delegate to a specialist agent instead of letting Claude keep guessing
+- Run `/effort max` at session start — this persists for the session
+
 **Q: How much does this all cost?**
 A: Warp is free. Claude Pro is $20/month (required minimum). GSD is free and open source. The minimum total cost is $20/month.
 
@@ -1587,6 +1611,57 @@ Claude Code and Co-Work are completely separate environments. They don't share:
 - MCP configurations (though both can connect to the same MCP servers)
 
 The vault itself is shared (same files on disk), but the tools used to access it are different.
+
+---
+
+### 12.5 Using Obsidian as a Project Hub (Recommended Structure)
+
+Once Obsidian is connected via MCP and CLI, the question becomes: what should live in your vault versus in your project repositories?
+
+#### The Hybrid Rule
+
+**Obsidian holds strategic knowledge** — decisions, research, meeting notes, cross-project thinking, daily planning, idea incubation.
+
+**Project repos hold technical state** — all `.planning/` GSD state, `CLAUDE.md`, phase artifacts, code, codebase intelligence.
+
+**Why this split?** GSD skills (all 29 of them) hardcode relative paths to `.planning/` from the project root. Moving planning files into Obsidian breaks every GSD command. Don't do it. Let each tool do what it's best at.
+
+#### Recommended Vault Structure
+
+```
+Your_Vault/
+  Projects/                # One folder per project
+    Project-A/             # Decision log, research, competitive analysis
+    Project-B/             # Same structure
+    Corporate/             # Cross-project business docs
+  Calendar/
+    Daily/                 # YYYY-MM-DD.md daily notes
+  Templates/               # Daily Note, Decision, Meeting Notes, Research
+  Resources/               # Reference material, API docs, design guides
+  Archive/                 # Completed/inactive projects
+```
+
+Each project folder contains:
+- **Decision Log** — key decisions with context, options considered, and rationale
+- **Research notes** — market research, competitive analysis, technical investigations
+- **Meeting notes** — investor meetings, team discussions, vendor calls
+
+#### Daily Notes Workflow
+
+1. **Session start:** Run `/vault-today` — pulls your daily note and recent context
+2. **During work:** Decisions and ideas get captured in the daily note
+3. **Session end:** Run `/vault-closeday` — summarizes what happened, captures carryover
+
+#### Memory Stack — Where Each Tool Fits
+
+| Layer | Tool | What It Stores |
+|-------|------|---------------|
+| Session state | Claude auto-memory | Working rules, preferences, project snapshots |
+| Cross-session | Honcho plugin | Behavioral patterns, stable preferences |
+| Strategic knowledge | Obsidian vault | Decisions, research, ideas, daily planning |
+| Conversation history | MemPalace (optional) | Verbatim past conversations, semantic search |
+
+Claude's auto-memory stores *rules about how to work*. Obsidian stores *what was decided and why*. Don't duplicate content across both.
 
 ---
 
