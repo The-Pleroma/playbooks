@@ -1,11 +1,14 @@
 ---
 name: atlas-setup
+version: 1.1.0
 description: Guided wizard to install the complete Atlas toolchain on a fresh Claude Code installation. Use when setting up a new machine, onboarding a team member, reinstalling after a reset, or when the user says "set up Atlas", "install everything", "fresh install", "bootstrap my tools", or "atlas-setup". Also use when checking what's installed or verifying the toolchain is complete.
 ---
 
 # Atlas Setup — Full Toolchain Wizard
 
-A guided, step-by-step installer for the Atlas development environment. Checks what's already installed, walks users through each tool category, handles account setup, and verifies everything works.
+**Version:** 1.1.0 | **Repo:** The-Pleroma/playbooks/gsd/atlas-setup/
+
+A guided, step-by-step installer for the Atlas development environment. Checks what's already installed, walks users through each tool category, handles account setup, and verifies everything works. Self-improving — captures fixes and checks for updates.
 
 ## Philosophy
 
@@ -428,6 +431,83 @@ Next steps:
 ```
 
 Use ✓ for installed, ✗ for skipped, ⚠ for warnings, ○ for staged.
+
+---
+
+## Self-Improvement System
+
+This skill is designed to get better with every run. Three mechanisms:
+
+### Self-Update Check (Run at Start)
+
+Before Phase 0, check if a newer version exists on GitHub:
+
+```bash
+# Fetch latest version from repo
+REMOTE_VERSION=$(gh api repos/The-Pleroma/playbooks/contents/gsd/atlas-setup/SKILL.md -q '.content' 2>/dev/null | base64 -d | grep "^version:" | head -1 | awk '{print $2}')
+LOCAL_VERSION="1.1.0"  # from this file's frontmatter
+
+if [ "$REMOTE_VERSION" != "$LOCAL_VERSION" ] && [ -n "$REMOTE_VERSION" ]; then
+  echo "Update available: $LOCAL_VERSION → $REMOTE_VERSION"
+fi
+```
+
+If an update exists, ask the user: "A newer version of atlas-setup is available (vX.X.X). Update now?" If yes:
+
+```bash
+gh api repos/The-Pleroma/playbooks/contents/gsd/atlas-setup/SKILL.md -q '.content' | base64 -d > ~/.claude/skills/atlas-setup/SKILL.md
+```
+
+Then reload and continue with the updated version.
+
+### Post-Run Feedback Capture (Run After Phase 8 Summary)
+
+After the final summary, ask:
+
+> "Did anything fail or need a workaround during setup? If so, describe what happened and how you fixed it. This helps improve the skill for future users."
+
+If the user provides feedback:
+
+1. **Log the run** — append to `~/.claude/skills/atlas-setup/run-history.json`:
+```json
+{
+  "date": "2026-04-13",
+  "os": "darwin",
+  "installed": ["gsd", "honcho", "firecrawl", "playwright"],
+  "skipped": ["figma", "supabase"],
+  "failed": [],
+  "fixes": [],
+  "feedback": "Everything worked smoothly"
+}
+```
+
+2. **If something failed and was fixed** — update the relevant install step in SKILL.md with the workaround. Add it as a "Common fix:" note under that tool's entry. Then push the update:
+```bash
+cp ~/.claude/skills/atlas-setup/SKILL.md /tmp/atlas-setup-update.md
+cd /tmp && gh api repos/The-Pleroma/playbooks/contents/gsd/atlas-setup/SKILL.md \
+  -X PUT \
+  -f message="fix(atlas-setup): add workaround for [tool] — [description]" \
+  -f content="$(base64 < /tmp/atlas-setup-update.md)" \
+  -f sha="$(gh api repos/The-Pleroma/playbooks/contents/gsd/atlas-setup/SKILL.md -q '.sha')"
+```
+
+3. **Bump the patch version** in the frontmatter (e.g., 1.1.0 → 1.1.1)
+
+### Auto-Discovery (Optional — Run Anytime)
+
+Check for new plugins or MCPs that aren't in the skill yet:
+
+```bash
+# List installed plugins
+grep -o '"[^"]*@[^"]*"' ~/.claude/settings.json | sort
+
+# Compare against skill's known list
+# Flag any new ones not covered by the skill
+```
+
+If new tools are found, ask: "You have [X] installed that isn't in atlas-setup yet. Want to add it to the skill so future setups include it?"
+
+If yes, add the new tool to the appropriate phase section, bump the minor version (e.g., 1.1.0 → 1.2.0), and push to the repo.
 
 ---
 
