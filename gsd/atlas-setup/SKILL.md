@@ -332,9 +332,60 @@ Explain: "These tools are installed but dormant. They need either API credits or
 
 ---
 
-### Phase 7: Final Summary
+### Phase 7: Co-Work Configuration
 
-After all installations, present a summary:
+Ask: "Do you use Claude Co-Work (claude.ai web interface or desktop app)? If so, I can configure your MCP servers to work there too."
+
+Explain the difference:
+- **Claude Code (CLI)**: Has skills, plugins, subagents, terminal access, and MCP servers
+- **Co-Work (web/desktop)**: Only has MCP servers and Projects with custom instructions
+- Skills like `/typeset`, `/dream`, GSD commands — CLI only
+- MCP servers (Obsidian, Firecrawl, Figma, Gamma, Context7) — work in both
+
+**7.1 Register MCPs at User Level**
+
+MCP servers must be registered with `--scope user` (not project-level) to be available in Co-Work. Run these for each MCP the user installed:
+
+```bash
+# Obsidian (if installed in Phase 3)
+claude mcp add obsidian --transport stdio --scope user -- npx -y @zethictech/obsidian-mcp
+# Then manually add env: {"OBSIDIAN_VAULT": "Vault_Name"} to the config
+
+# Firecrawl (if installed in Phase 4)
+claude mcp add firecrawl --transport stdio --scope user -- npx -y firecrawl-mcp
+
+# Gamma (if installed in Phase 4)
+claude mcp add gamma --transport stdio --scope user -e GAMMA_API_KEY=<key> -- npx -y @raydeck/gamma-app-mcp
+
+# Context7 (always — no account needed)
+claude mcp add context7 --transport stdio --scope user -- npx -y @upstash/context7-mcp
+
+# Figma (if installed in Phase 2)
+# Usually already user-level from plugin install
+```
+
+- Check: `grep mcpServers ~/.claude.json` — servers should appear at the top level, not under a project path
+- Verify: Open Co-Work, start a new conversation, check that MCP tools appear
+
+**7.2 MARP in Co-Work (Optional)**
+
+MARP is a skill file, so it doesn't work directly in Co-Work. But you can create a Co-Work Project with MARP instructions:
+
+1. In claude.ai, create a new Project (e.g., "Presentations")
+2. In the Project instructions, paste the core MARP knowledge from the SKILL.md
+3. Now Claude in Co-Work can build MARP decks when you work in that Project
+
+**7.3 Important Co-Work Notes**
+
+- **Obsidian must be running locally** for the Obsidian MCP to work in Co-Work
+- **MCP servers run on your machine** — Co-Work connects to them via the desktop app bridge. If you're on a different computer or mobile, MCPs won't be available.
+- **Skills, plugins, GSD, subagents** — none of these work in Co-Work. Only MCP tools and Project custom instructions.
+
+---
+
+### Phase 8: Final Summary
+
+After all installations (including Co-Work configuration), present a summary:
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
