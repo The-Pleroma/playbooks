@@ -576,21 +576,30 @@ Daily notes are the bridge between sessions — each day gets a markdown file th
    - **Date format:** `YYYY-MM-DD`
    - **Template file** (optional): leave blank for now
 
-### Step 4: Install the Obsidian CLI
+### Step 4: Enable the Obsidian CLI (comes with the app)
 
-The official Obsidian CLI (v1.12.4+, released February 2026) gives Claude Code direct terminal access to your vault — 100+ commands. Install via Homebrew:
+The official Obsidian CLI (v1.12.4+, released February 2026) gives Claude Code direct terminal access to your vault — 100+ commands. The `obsidian` CLI is built into the Obsidian desktop app — not a separate install. Enable it after installing the app:
 
-```bash
-brew install obsidian-cli
-```
+1. Install Obsidian if you haven't already (done in an earlier step):
+   ```bash
+   brew install --cask obsidian
+   ```
 
-Verify:
+2. Open Obsidian. Go to **Settings → General → Advanced** (or similar — location varies by Obsidian version, look for "CLI" or "Register CLI").
 
-```bash
-obsidian version
-```
+3. Toggle **Command line interface** ON, then click **Register CLI**. This creates the symlink `/usr/local/bin/obsidian` pointing to the binary inside the Obsidian app bundle.
 
-You should see `1.12.4` or later. If `brew install obsidian-cli` isn't available, the alternative is to enable the built-in CLI inside Obsidian: Settings → General → Advanced → toggle **Command line interface** ON → click **"Register CLI"**. This adds the `obsidian` binary to your PATH.
+4. Verify:
+   ```bash
+   which obsidian
+   # Expected: /usr/local/bin/obsidian
+   obsidian help | head
+   # Expected: a list of subcommands like daily:read, daily:append, etc.
+   ```
+
+**Do NOT install `yakitrak/yakitrak/obsidian-cli` from Homebrew** — that is a different, older Python tool with a different command set. Our scripts depend on Obsidian's built-in CLI, which the steps above activate.
+
+If the Register CLI toggle is missing in your Obsidian version, upgrade Obsidian to the latest stable release — the feature is available in v1.12.4+.
 
 ### Step 5: Test Vault Access
 

@@ -165,11 +165,12 @@ Honcho is a Claude Desktop plugin. Setup begins in Desktop; both Claude Code and
   - Settings → Core plugins → Daily Notes → toggle on
   - Settings → Daily Notes → New file location: `Calendar/Daily/`
   - Date format: `YYYY-MM-DD`
-- **Install Obsidian CLI via Homebrew** (v1.12.4+)
-  - Check: `which obsidian-cli`
-  - Install: `brew install obsidian-cli`
-  - Alternative: enable built-in CLI in Obsidian → Settings → General → Advanced → Command line interface → Register CLI
-  - Verify: `obsidian version` — should show `1.12.4` or later
+- **Enable Obsidian's built-in CLI** (ships with the app, v1.12.4+)
+  - The `obsidian` CLI is built into the Obsidian desktop app — not a separate Homebrew install
+  - Open Obsidian → Settings → General → Advanced → toggle **Command line interface** ON → click **Register CLI**
+  - This symlinks `/usr/local/bin/obsidian` to the binary inside the Obsidian app bundle
+  - Verify: `which obsidian` (expect `/usr/local/bin/obsidian`), then `obsidian version` — should show `1.12.4` or later
+  - **Do NOT** install `yakitrak/yakitrak/obsidian-cli` from Homebrew — that's a different, older Python tool with a different command set
 
 ### B.2 Core MCPs
 
