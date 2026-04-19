@@ -13,6 +13,30 @@ Works on Every Claude Tier:
 
 ---
 
+## Install Overview — Memory-First Order (April 2026)
+
+This manual is now organized so the **memory layer lands before the skills cohort**. Most skills (vault-today, vault-closeday, the 12 Vault Skills, dream consolidation) read from your Obsidian vault — they fail silently if the vault isn't wired up first. So we install the foundation and memory layer in that exact order, then everything else.
+
+**Phase A — Base:**
+1. macOS prereqs (Homebrew, Warp, zsh)
+2. Runtimes (Node, Bun, Python, git, gh)
+3. Claude Code CLI
+4. Claude Desktop + Honcho
+
+**Phase B — Memory foundation:**
+5. Obsidian + vault
+6. Core MCPs (Obsidian, Context7, optional Supabase/Firecrawl/Gamma)
+7. second-brain-bridge — one-command install scaffolds `6-AI-Memory/`, symlinks `vault-session` + `vault-closeday` skills, installs the Honcho nightly job
+8. graphify
+
+**Phase C — Everything else:**
+9. GSD workflow
+10. Skills cohort (Superpowers, Codex Experts, Impeccable, Figma, MARP, Playwright, etc.)
+11. atlas-setup self-check
+12. Per-project setup
+
+---
+
 ## Table of Contents
 
 - [Part 1: What You Need to Know Before You Start](#part-1-what-you-need-to-know-before-you-start)
@@ -20,14 +44,19 @@ Works on Every Claude Tier:
 - [Part 3: Setting Up Your Mac](#part-3-setting-up-your-mac) (includes GitHub setup)
 - [Part 4: Installing and Using Warp Terminal](#part-4-installing-and-using-warp-terminal)
 - [Part 5: Installing Claude Code](#part-5-installing-claude-code)
-- [Part 6: Skills, Plugins, and MCPs — Extending Claude Code](#part-6-skills-plugins-and-mcps--extending-claude-code)
-- [Part 7: Installing and Using GSD](#part-7-installing-and-using-gsd-get-shit-done)
-- [Part 8: The Complete Workflow — Start to Finish](#part-8-the-complete-workflow--start-to-finish)
-- [Part 9: Adding an Existing Project to GSD](#part-9-adding-an-existing-project-to-gsd)
-- [Part 10: Tier-Specific Workflow Strategies](#part-10-tier-specific-workflow-strategies)
-- [Part 11: Troubleshooting & FAQ](#part-11-troubleshooting--faq)
-- [Part 12: Connecting Obsidian (Your Second Brain)](#part-12-connecting-obsidian-your-second-brain)
-- [Part 13: Expert Sub-Agents & Additional Skills](#part-13-expert-sub-agents--additional-skills)
+- [Part 6: Claude Desktop + Honcho](#part-6-claude-desktop--honcho)
+- [Part 7: Obsidian + Vault Setup (Your Second Brain)](#part-7-obsidian--vault-setup-your-second-brain)
+- [Part 8: Core MCPs — Registering Them Once for Both Surfaces](#part-8-core-mcps--registering-them-once-for-both-surfaces)
+- [Part 9: second-brain-bridge — One-Command Memory Install](#part-9-second-brain-bridge--one-command-memory-install)
+- [Part 10: graphify — Knowledge Graph Over the Vault](#part-10-graphify--knowledge-graph-over-the-vault)
+- [Part 11: Skills, Plugins, and Extra MCPs](#part-11-skills-plugins-and-extra-mcps)
+- [Part 12: Installing and Using GSD](#part-12-installing-and-using-gsd-get-shit-done)
+- [Part 13: The Complete Workflow — Start to Finish](#part-13-the-complete-workflow--start-to-finish)
+- [Part 14: Adding an Existing Project to GSD](#part-14-adding-an-existing-project-to-gsd)
+- [Part 15: Tier-Specific Workflow Strategies](#part-15-tier-specific-workflow-strategies)
+- [Part 16: Troubleshooting & FAQ](#part-16-troubleshooting--faq)
+- [Appendix: Obsidian Reference (Deep-Dive)](#appendix-obsidian-reference-deep-dive)
+- [Part 17: Expert Sub-Agents & Additional Skills](#part-17-expert-sub-agents--additional-skills)
 - [Quick Reference: All Commands at a Glance](#quick-reference-all-commands-at-a-glance)
 - [Addendum: Session Handoff Skill](#addendum-session-handoff-skill)
 
@@ -468,7 +497,302 @@ Then type in the Claude Code prompt: "Create a simple hello world HTML file". If
 
 ---
 
-## Part 6: Skills, Plugins, and MCPs — Extending Claude Code
+## Part 6: Claude Desktop + Honcho
+
+Honcho is a Claude Desktop plugin that stores your cross-session preferences and behavioral patterns in the cloud. Install Desktop first, then install Honcho inside it — both Claude Code and Desktop will then read the same credentials.
+
+### Step 1: Install Claude Desktop
+
+Download the Claude Desktop app from https://claude.ai/download and drag it to Applications. Sign in with the same Claude account you used for Claude Code in Part 5.
+
+Verify:
+
+```bash
+ls /Applications/Claude.app
+```
+
+### Step 2: Install the Honcho plugin
+
+Launch Claude Desktop (or Claude Code — either works), then run these commands one at a time:
+
+```
+/plugin marketplace add plastic-labs/claude-honcho
+/plugin install honcho@honcho
+/reload-plugins
+```
+
+### Step 3: Configure Your Honcho API Key
+
+Get your API key from https://honcho.dev (free tier is fine to start). Then inside Claude run:
+
+```
+/honcho:setup
+```
+
+Paste your API key when prompted.
+
+### Step 4: Verify
+
+```
+/honcho:status
+```
+
+This should return "connected" with your user ID shown. If it fails, check that the API key is correct and that the marketplace plugin was actually installed (run `/plugin list` to confirm).
+
+> **WHY HONCHO COMES BEFORE OBSIDIAN**
+>
+> Honcho stores distilled behavioral patterns — your preferences, how you like to communicate, working rules. The second-brain-bridge (Part 9) installs a nightly job that mirrors Honcho's conclusions into your Obsidian vault. So Honcho needs to be running before you install the bridge, or the first nightly mirror has nothing to pull.
+
+---
+
+## Part 7: Obsidian + Vault Setup (Your Second Brain)
+
+This is the memory foundation. Install Obsidian, create a vault, and set up daily notes. Part 8 registers the Obsidian MCP so Claude can read the vault. Part 9 scaffolds the `6-AI-Memory/` folder that all three Claude surfaces (Code, Desktop, Cowork) read and write to.
+
+### Step 1: Install Obsidian
+
+Download from https://obsidian.md (free for personal use). Drag Obsidian.app to your Applications folder.
+
+Verify:
+
+```bash
+ls /Applications/Obsidian.app
+```
+
+### Step 2: Create Your Vault
+
+On first launch, Obsidian prompts you to create a new vault or open an existing one. Pick **"Create new vault"**.
+
+- **Vault name:** for a brand-new setup, use `MyVault` as a safe default. You can rename later. (Seph's vault is `The_Pleroma` at `~/Documents/The_Pleroma/` — that already exists.)
+- **Location:** `~/Documents/MyVault/` (keep vaults inside `~/Documents` — the MCP and install scripts assume this path shape.)
+
+### Step 3: Enable Daily Notes
+
+Daily notes are the bridge between sessions — each day gets a markdown file that Claude can read at session start and append to during the day.
+
+1. In Obsidian, go to **Settings (gear icon) → Core plugins → Daily Notes** → toggle ON
+2. Then **Settings → Daily Notes**
+   - **New file location:** `Calendar/Daily/`
+   - **Date format:** `YYYY-MM-DD`
+   - **Template file** (optional): leave blank for now
+
+### Step 4: Install the Obsidian CLI
+
+The official Obsidian CLI (v1.12.4+, released February 2026) gives Claude Code direct terminal access to your vault — 100+ commands. Install via Homebrew:
+
+```bash
+brew install obsidian-cli
+```
+
+Verify:
+
+```bash
+obsidian version
+```
+
+You should see `1.12.4` or later. If `brew install obsidian-cli` isn't available, the alternative is to enable the built-in CLI inside Obsidian: Settings → General → Advanced → toggle **Command line interface** ON → click **"Register CLI"**. This adds the `obsidian` binary to your PATH.
+
+### Step 5: Test Vault Access
+
+```bash
+obsidian vaults          # should show your vault name
+obsidian files | head    # should list files in your vault
+obsidian daily:read      # should show today's daily note (or create it)
+```
+
+If all three commands return sensible output, the CLI is wired up and ready for Part 8 and Part 9.
+
+> **IMPORTANT: Keep Obsidian running**
+>
+> Several parts below (MCPs, vault-session skill, vault-today) need Obsidian to be running. If Obsidian is closed, the MCP server connects to nothing and tools fail silently. Best practice: add Obsidian to your login items so it's always open.
+
+> **Full Obsidian deep-dive available in the Appendix** — if you want the complete CLI command table, the MCP internals, the vault-as-project-hub pattern, and Co-Work specifics, jump to **Appendix: Obsidian Reference (Deep-Dive)** near the end of this manual.
+
+---
+
+## Part 8: Core MCPs — Registering Them Once for Both Surfaces
+
+MCPs (Model Context Protocol servers) are external server processes Claude connects to for specialized capabilities. Register them with `--scope user` so both Claude Code and Claude Desktop see them from the same config.
+
+### Obsidian MCP (required)
+
+The Obsidian MCP lets Claude search, read, create, and edit notes in your vault. This is what makes Co-Work work with your vault, and it's also the backstop Claude Code uses when the CLI isn't available.
+
+```bash
+claude mcp add obsidian --transport stdio --scope user -- npx -y @zethictech/obsidian-mcp
+```
+
+Then tell it which vault to use. Open `~/.claude.json` in any editor, find the obsidian MCP entry under `mcpServers`, and add the `env` block:
+
+```json
+"obsidian": {
+  "command": "npx",
+  "args": ["-y", "@zethictech/obsidian-mcp"],
+  "env": {
+    "OBSIDIAN_VAULT": "MyVault"
+  }
+}
+```
+
+Replace `MyVault` with your actual vault name.
+
+Verify: restart Claude Code, then ask "List what's in my Obsidian vault." The MCP tool `mcp__obsidian__get_vault_info` should fire and return your vault structure.
+
+### Context7 (required — no account needed)
+
+Fetches current docs for any library, framework, SDK, or CLI tool. Prevents Claude from using outdated API methods.
+
+```bash
+claude mcp add context7 --transport stdio --scope user -- npx -y @upstash/context7-mcp
+```
+
+Verify: the MCP tool `mcp__context7__resolve-library-id` should appear in your available tools.
+
+### Supabase (optional — for backend work)
+
+If you're building anything backed by Supabase:
+
+- Install via `/plugins` inside Claude Code → search "Supabase" → install
+- Or register manually: follow Supabase's CLI linking instructions for your project
+- Account needed: supabase.com + your project ref
+
+### Firecrawl (optional — for web scraping)
+
+```bash
+claude mcp add firecrawl --transport stdio --scope user -- npx -y firecrawl-mcp
+```
+
+Account needed: firecrawl.dev (free tier: 500 credits/month).
+
+### Gamma (optional — for AI presentations)
+
+```bash
+claude mcp add gamma --transport stdio --scope user -e GAMMA_API_KEY=<your-key> -- npx -y @raydeck/gamma-app-mcp
+```
+
+Account needed: gamma.app API key.
+
+### Checkpoint
+
+Before moving to Part 9, confirm:
+
+```bash
+grep -A2 'obsidian' ~/.claude.json | head -20
+grep -A2 'context7' ~/.claude.json | head -20
+```
+
+Both should show the MCP registered at the top-level `mcpServers` (not nested inside a project entry). If they're nested under a project path, re-run the commands above with `--scope user`.
+
+---
+
+## Part 9: second-brain-bridge — One-Command Memory Install
+
+`second-brain-bridge` is the canonical installer for the Atlas memory layer. One command scaffolds the entire `6-AI-Memory/` folder structure in your vault, symlinks the `vault-session` and `vault-closeday` skills into `~/.claude/skills/`, installs a PostToolUse hook that logs every Obsidian MCP call, installs the Honcho nightly launchd job, and prints three paste-in templates so every Claude surface knows to use the vault as canonical memory.
+
+Before v1.2.0 of this manual, each of those pieces got installed by hand. That's error-prone and the order mattered. The bridge bundles it all.
+
+### Step 1: Clone and Install
+
+```bash
+git clone https://github.com/Seph396/second-brain-bridge ~/Developer/second-brain-bridge
+cd ~/Developer/second-brain-bridge
+./bin/install.sh --vault-root "$HOME/Documents/MyVault"
+```
+
+Replace `MyVault` with your actual vault name. For Seph: `$HOME/Documents/The_Pleroma`.
+
+> **REPO VISIBILITY**
+>
+> As of April 2026 the repo is private. If the clone fails with "repository not found", you need to be invited as a collaborator, or wait for the public release. When it goes public, update this command to use the public URL.
+
+### Step 2: Paste the Three Templates
+
+When `install.sh` finishes, it prints three blocks of text labeled clearly. Paste each into the matching spot:
+
+1. **Desktop Profile** — Claude Desktop → Settings → Profile. Paste there.
+2. **Cowork Global** — Cowork → Settings → Global instructions. Paste there.
+3. **Claude Code CLAUDE.md** — append to `~/.claude/CLAUDE.md` (the user-level, not project-level, CLAUDE.md).
+
+These templates tell each surface to treat the vault's `6-AI-Memory/` folder as canonical memory, to log sessions there, and to close them out at end of day.
+
+### Step 3: Verify
+
+```bash
+ls "$HOME/Documents/MyVault/6-AI-Memory/"    # Daily/ _sessions/ Honcho/ Decisions/
+ls -la ~/.claude/skills/vault-session/       # should be a symlink (arrow shown)
+ls -la ~/.claude/skills/vault-closeday/      # should be a symlink (arrow shown)
+launchctl list | grep honcho                 # should show the nightly launchd job
+```
+
+If all four pass, the memory layer is live. Every session you start from this point forward will auto-log to the vault, and Honcho will mirror its conclusions nightly.
+
+### What You Just Installed
+
+| Piece | Location | What It Does |
+|-------|----------|-------------|
+| `6-AI-Memory/` scaffold | `<vault>/6-AI-Memory/` | Daily/, _sessions/, Honcho/, Decisions/ subfolders |
+| `vault-session` skill | `~/.claude/skills/vault-session/` (symlink) | Logs current session into `_sessions/YYYY-MM-DD_*.md` |
+| `vault-closeday` skill | `~/.claude/skills/vault-closeday/` (symlink) | End-of-day consolidation into `Daily/YYYY-MM-DD.md` |
+| PostToolUse hook | `~/.claude/hooks/obsidian-mcp-logger.sh` | Auto-logs every Obsidian MCP call as a backstop |
+| Honcho nightly plist | `~/Library/LaunchAgents/*.honcho-snapshot.plist` | Mirrors Honcho conclusions into vault nightly |
+
+If you want to understand the architecture before running the install, read `~/Developer/second-brain-bridge/README.md` and `docs/ARCHITECTURE.md`.
+
+---
+
+## Part 10: graphify — Knowledge Graph Over the Vault
+
+`graphify` turns any input (code, docs, papers, images) into a clustered knowledge graph with HTML + JSON + audit report output. Pointed at your vault, it produces a visual link graph that surfaces emerging themes and orphaned ideas.
+
+### Install
+
+```bash
+pipx install graphifyy==0.4.23
+graphify install
+```
+
+If `pipx` isn't installed yet, install it first:
+
+```bash
+brew install pipx
+pipx ensurepath
+```
+
+### Verify
+
+```bash
+graphify --version
+```
+
+Should show `0.4.23`.
+
+### First Run (Optional)
+
+Point it at your vault to generate an initial graph:
+
+```bash
+cd ~/Documents/MyVault
+graphify analyze . --output ~/Desktop/vault-graph.html
+open ~/Desktop/vault-graph.html
+```
+
+This produces an interactive HTML graph of all the wikilinks and tag relationships in your vault. Useful for spotting clusters that are ready to become standalone projects (see the `vault-emerge` skill).
+
+> **Phase B Complete**
+>
+> At this point you have: base tools (Phase A, Parts 3-5), and the memory foundation (Phase B, Parts 6-10). The vault is wired up, MCPs are registered, `6-AI-Memory/` is scaffolded, Honcho is mirroring nightly, and graphify can render the link graph. Everything Phase C installs (GSD, the skills cohort) will now work correctly out of the box.
+
+---
+
+## Part 11: Skills, Plugins, and Extra MCPs
+
+> **Order matters.** Phase A (Parts 3-5) set up the base. Phase B (Parts 6-10) installed the memory foundation. This part is Phase C — the skills cohort. If you jumped here without completing Parts 6-10, stop and go back. Half the skills below read from the vault; they'll install successfully but fail at runtime.
+
+### Honcho Install Pointer
+
+If you followed the new install order, Honcho was already installed in **Part 6** alongside Claude Desktop. Skip the `/plugins honcho` step in the old flow below — the marketplace add + `/honcho:setup` have already been done.
+
+### Existing Skills, Plugins, MCPs Content Follows
 
 Out of the box, Claude Code is very capable. But Claude's capabilities can be extended further with Skills and Plugins — installable packages that add new behaviors, reference materials, specialized workflows, and custom commands.
 
@@ -557,13 +881,13 @@ Type this inside Claude Code:
 
 This opens the plugin browser. Search for and install each of the following:
 
-- **context7** — Gives Claude Code access to up-to-date documentation for any software library. Without this, Claude may use outdated API methods. Essential for any coding project.
-- **honcho** — Personalization and memory. Honcho learns your preferences, communication style, and working patterns over time. Note: Honcho uses a custom marketplace — search for it in /plugins and follow the prompt to add the Honcho marketplace (plastic-labs/claude-honcho) when asked.
 - **playground** — A sandbox for testing ideas and code snippets without touching your main project.
 - **superpowers** — A collection of enhanced capabilities that expand what Claude Code can do out of the box.
 - **claude-md-management** — Maintains and updates your CLAUDE.md project memory file automatically.
 - **skill-creator** — Lets Claude Code build reusable skills — packaged sets of instructions for tasks you repeat across projects.
 - **security-guidance** — Adds security awareness to Claude's suggestions, flagging potential vulnerabilities as it helps you build.
+
+> **Already installed in earlier parts:** `honcho` (Part 6), `context7` and `obsidian` MCP (Part 8). Don't reinstall them here.
 
 ### Step 7: Optional Plugins and MCPs
 
@@ -610,7 +934,7 @@ When you have finished installing the plugins and MCPs you want, type `/exit` to
 
 ---
 
-## Part 7: Installing and Using GSD (Get Shit Done)
+## Part 12: Installing and Using GSD (Get Shit Done)
 
 ### What Is GSD?
 
@@ -724,7 +1048,7 @@ To see what has changed since your last update, type inside Claude Code:
 
 ---
 
-## Part 8: The Complete Workflow — Start to Finish
+## Part 13: The Complete Workflow — Start to Finish
 
 This section walks you through the entire process of creating a project from scratch using all the tools together. We will use a real example: building a personal portfolio website.
 
@@ -854,7 +1178,7 @@ This archives your V1 work and prepares the system for V2 if you want to add mor
 
 ---
 
-## Part 9: Adding an Existing Project to GSD
+## Part 14: Adding an Existing Project to GSD
 
 If you already have a project — whether you built it with Claude in the chat interface, coded it by hand, inherited it from someone else, or developed it with any other tool — you can absolutely bring it into the GSD workflow. You do not need to start from scratch. This section walks you through every step.
 
@@ -1073,7 +1397,7 @@ This starts a fresh planning cycle for V2, V3, etc. — same flow as `/gsd:new-p
 
 ---
 
-## Part 10: Tier-Specific Workflow Strategies
+## Part 15: Tier-Specific Workflow Strategies
 
 Your Claude subscription tier directly affects how you should use this workflow. Here are specific strategies for each tier.
 
@@ -1135,7 +1459,7 @@ Then select your preferred profile.
 
 ---
 
-## Part 11: Troubleshooting & FAQ
+## Part 16: Troubleshooting & FAQ
 
 ### Installation Issues
 
@@ -1230,7 +1554,9 @@ A: Warp and Claude Code both support Windows and Linux. GSD works on all three p
 
 ---
 
-## Part 12: Connecting Obsidian (Your Second Brain)
+## Appendix: Obsidian Reference (Deep-Dive)
+
+> **If you followed the memory-first install order (Parts 6-10), you've already done the essentials.** Part 7 is the quick-start; Part 9 (second-brain-bridge) scaffolds `6-AI-Memory/` and installs the vault skills. This appendix is the long-form reference — MCP internals, CLI command tables, Co-Work specifics, vault-as-project-hub patterns. Keep it for lookup, not as a step-by-step.
 
 Obsidian is a markdown-based knowledge management app — a "second brain" where you store notes, ideas, research, and brain dumps. By connecting it to Claude Code (and optionally Claude Co-Work on the web), Claude can read your notes, search your vault, and create new notes directly. This means you can brain dump ideas into Obsidian anytime, and Claude will naturally have that context in future sessions without you having to re-explain anything.
 
@@ -1630,9 +1956,11 @@ The key insight: Claude's auto-memory stores *rules about how to work*. Obsidian
 
 ---
 
-## Part 13: Expert Sub-Agents & Additional Skills
+## Part 17: Expert Sub-Agents & Additional Skills
 
-### 13.1 Installing 136 Expert Sub-Agents (Codex Experts)
+> Most of this section's content has been folded into Part 11 (Skills cohort) under the new install order. It's preserved here as a detailed reference for users who want the full walkthrough of each individual tool. If you ran `./bin/install.sh` from second-brain-bridge (Part 9) you already have the 12 Vault Skills and Dream — the sections below are informational.
+
+### 17.1 Installing 136 Expert Sub-Agents (Codex Experts)
 
 #### What This Is
 
@@ -1732,7 +2060,10 @@ You don't need to do anything special — Claude automatically knows when to bri
 
 ---
 
-### 13.2 Installing Dream Memory Consolidation
+### 17.2 Installing Dream Memory Consolidation
+
+> Dream is now shipped as part of the second-brain-bridge install (Part 9). The manual steps below still work if you want to install it standalone or understand how it's wired up.
+
 
 #### What This Is
 
@@ -1803,7 +2134,7 @@ Claude should begin the memory consolidation process and return a summary of wha
 
 ---
 
-### 13.3 Installing Impeccable Design Skills (21 Skills)
+### 17.3 Installing Impeccable Design Skills (21 Skills)
 
 #### What This Is
 
