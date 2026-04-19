@@ -156,7 +156,9 @@ Honcho is a Claude Desktop plugin. Setup begins in Desktop; both Claude Code and
 
 - **Install Obsidian**
   - Check: `ls /Applications/Obsidian.app 2>/dev/null`
-  - Install: download from obsidian.md (free for personal use)
+  - Primary: `brew install --cask obsidian`
+  - Alternative: direct download from https://obsidian.md/download
+  - **NOT the Mac App Store** — sandboxed, breaks plugin compatibility including the Obsidian MCP server our memory system depends on. If you have the App Store version, uninstall it first.
 - **Create a vault**
   - Default name for new users: `MyVault`
   - For Seph specifically: `The_Pleroma` (already exists at `~/Documents/The_Pleroma/`)
@@ -170,7 +172,9 @@ Honcho is a Claude Desktop plugin. Setup begins in Desktop; both Claude Code and
   - Open Obsidian → Settings → General → Advanced → toggle **Command line interface** ON → click **Register CLI**
   - This symlinks `/usr/local/bin/obsidian` to the binary inside the Obsidian app bundle
   - Verify: `which obsidian` (expect `/usr/local/bin/obsidian`), then `obsidian version` — should show `1.12.4` or later
-  - **Do NOT** install `yakitrak/yakitrak/obsidian-cli` from Homebrew — that's a different, older Python tool with a different command set
+  - > **Critical — ignore `brew search obsidian-cli` results.**
+    >
+    > If you search for the Obsidian CLI via Homebrew you will see `yakitrak/yakitrak/obsidian-cli` (a third-party Python tool). **That is NOT what we use.** Its command set is different and incompatible with our scripts. Do not install it. The `obsidian` CLI our setup needs ships inside the Obsidian app — enable it via Settings → (Advanced → Register CLI) as shown above.
 
 ### B.2 Core MCPs
 

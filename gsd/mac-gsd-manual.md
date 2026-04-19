@@ -551,7 +551,27 @@ This is the memory foundation. Install Obsidian, create a vault, and set up dail
 
 ### Step 1: Install Obsidian
 
-Download from https://obsidian.md (free for personal use). Drag Obsidian.app to your Applications folder.
+#### Installation source — IMPORTANT
+
+Three ways to get Obsidian on macOS, but only two work for our setup:
+
+| Method | Recommendation | Reason |
+|---|---|---|
+| `brew install --cask obsidian` | **Use this** | Easiest. Fully unrestricted. All plugins work. |
+| Download from [obsidian.md](https://obsidian.md/download) | **Also fine** | Same binary as Homebrew cask. Slight friction (manual DMG + drag to Applications). |
+| Mac App Store | **DO NOT USE** | Sandboxed by macOS. Some plugins — including the Obsidian MCP server our memory system depends on — will not work. If you already installed from App Store, uninstall it and re-install via Homebrew or direct download. |
+
+If you already have Obsidian from App Store: remove it first, then install via Homebrew or the direct download.
+
+#### Install
+
+Recommended:
+
+```bash
+brew install --cask obsidian
+```
+
+Or download from https://obsidian.md/download (free for personal use) and drag Obsidian.app to your Applications folder.
 
 Verify:
 
@@ -597,7 +617,9 @@ The official Obsidian CLI (v1.12.4+, released February 2026) gives Claude Code d
    # Expected: a list of subcommands like daily:read, daily:append, etc.
    ```
 
-**Do NOT install `yakitrak/yakitrak/obsidian-cli` from Homebrew** — that is a different, older Python tool with a different command set. Our scripts depend on Obsidian's built-in CLI, which the steps above activate.
+> **Critical — ignore `brew search obsidian-cli` results.**
+>
+> If you search for the Obsidian CLI via Homebrew you will see `yakitrak/yakitrak/obsidian-cli` (a third-party Python tool). **That is NOT what we use.** Its command set is different and incompatible with our scripts. Do not install it. The `obsidian` CLI our setup needs ships inside the Obsidian app — enable it via Settings → (Advanced → Register CLI) as shown in the steps above.
 
 If the Register CLI toggle is missing in your Obsidian version, upgrade Obsidian to the latest stable release — the feature is available in v1.12.4+.
 
