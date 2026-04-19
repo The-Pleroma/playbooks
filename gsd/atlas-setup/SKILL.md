@@ -154,20 +154,47 @@ Honcho is a Claude Desktop plugin. Setup begins in Desktop; both Claude Code and
 
 ### B.1 Obsidian + vault
 
-- **Verify Obsidian is installed:**
-  - `test -d /Applications/Obsidian.app || echo "INSTALL OBSIDIAN FIRST (see manual Part 7)"`
-  - If not installed, halt and direct user back to the manual.
-- **Create a vault**
-  - Default name for new users: `MyVault`
-  - For Seph specifically: `The_Pleroma` (already exists at `~/Documents/The_Pleroma/`)
-  - Store at `~/Documents/<vault-name>/`
-- **Enable Daily Notes core plugin**
+**B.1.1 Install Obsidian desktop app**
+
+```bash
+brew install --cask obsidian
+```
+
+If already installed, skip. If installed via Mac App Store (sandboxed, plugin-incompatible), uninstall first:
+
+```bash
+# Only if App Store version was installed:
+# Open Finder → Applications → drag Obsidian to Trash → brew install --cask obsidian
+```
+
+**B.1.2 Register Obsidian's built-in CLI**
+
+Obsidian ships a CLI binary that we need symlinked to `/usr/local/bin/obsidian`. The skill cannot toggle this automatically — Obsidian's setting lives inside the app. User action required once:
+
+1. Open Obsidian.
+2. Settings → General → Advanced → toggle **Register CLI** on. (Location may vary by Obsidian version; look for "Register CLI" or "CLI".)
+3. Return to this skill.
+
+Verify after user confirms:
+
+```bash
+which obsidian
+# Expected: /usr/local/bin/obsidian -> /Applications/Obsidian.app/Contents/MacOS/obsidian-cli
+obsidian help | head -5
+```
+
+If `which obsidian` is empty, the Register CLI toggle didn't land — direct user back to Obsidian settings, ensure Obsidian is v1.4.0+.
+
+**B.1.3 Create or open vault**
+
+Prompt user for vault path (default `$HOME/Documents/MyVault`). If vault doesn't exist, Obsidian will offer to create it when opened. User does this step through Obsidian's UI — skill cannot script it (Obsidian requires GUI interaction to create a vault).
+
+After vault exists, skill continues to B.2 (MCP install).
+
+- **Enable Daily Notes core plugin** (inside the vault, once created)
   - Settings → Core plugins → Daily Notes → toggle on
   - Settings → Daily Notes → New file location: `Calendar/Daily/`
   - Date format: `YYYY-MM-DD`
-- **Verify Obsidian built-in CLI is registered:**
-  - `which obsidian` → expected: `/usr/local/bin/obsidian` → `/Applications/Obsidian.app/Contents/MacOS/obsidian-cli`
-  - If not found, halt and direct user to manual Part 7 Step 4 (enable Register CLI in Obsidian settings).
 
 ### B.2 Core MCPs
 
