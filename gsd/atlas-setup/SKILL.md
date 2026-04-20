@@ -228,6 +228,18 @@ Register MCPs at `--scope user` so both Claude Code and Claude Desktop see them.
 - **Gamma** (optional, for AI presentations)
   - Install: `claude mcp add gamma --transport stdio --scope user -e GAMMA_API_KEY=<key> -- npx -y @raydeck/gamma-app-mcp`
   - Account needed: gamma.app API key
+- **iwork** (optional — install if user works in Apple Pages/Numbers/Keynote)
+  - Install: `claude mcp add iwork --transport stdio --scope user -- npx -y iwork-mcp`
+  - Also add to Desktop `claude_desktop_config.json` under `mcpServers.iwork`
+  - First-run: macOS will prompt for Automation permission -> approve via System Settings -> Privacy & Security -> Automation
+  - Verify: call `mcp__iwork__*` tool after Claude Code restart
+  - Repo: https://github.com/reichenbach/iwork_mcp (young project, Feb 2026, no LICENSE file — personal use OK)
+- **macos-automator** (optional — install for AppleScript / macOS automation access)
+  - Install: `claude mcp add macos-automator --transport stdio --scope user -- npx -y @steipete/macos-automator-mcp@latest`
+  - Also add to Desktop `claude_desktop_config.json` under `mcpServers.macos-automator`
+  - First-run: approve Automation + Accessibility permissions via System Settings (Accessibility grants broader UI control — optional but needed for keystroke simulation)
+  - Verify: call `mcp__macos-automator__execute_script` with a simple `return "hello"` AppleScript
+  - Repo: https://github.com/steipete/macos-automator-mcp (760 stars, MIT, actively maintained)
 
 ### B.3 second-brain-bridge — one-command memory scaffold
 
