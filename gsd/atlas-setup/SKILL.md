@@ -127,24 +127,35 @@ This is the foundation. Nothing in Phase B or C will work until all four of thes
 
 ### A.4 Claude Desktop + Honcho
 
-Honcho is a Claude Desktop plugin. Setup begins in Desktop; both Claude Code and Desktop pick up the same credentials.
+Honcho (by Plastic Labs) is the cross-session memory plugin. Same marketplace install works for Claude Code and Claude Desktop — one Honcho account feeds both surfaces.
 
 - **Claude Desktop app**
   - Check: `ls /Applications/Claude.app 2>/dev/null`
   - Install: download from `claude.ai/download`
   - Sign in with the same account used for Claude Code
-- **Honcho plugin**
-  - What: cross-session memory that persists user preferences and behavioral patterns in the cloud
-  - Check: `grep -q "honcho" ~/.claude/settings.json 2>/dev/null`
-  - Install (in Claude Desktop or Code):
+- **Bun** (required by the Honcho plugin)
+  - Check: `which bun`
+  - Install: `curl -fsSL https://bun.sh/install | bash` (or `brew install oven-sh/bun/bun` from A.2)
+- **Honcho account + API key**
+  - Sign up: `https://app.honcho.dev` — Google, GitHub, or email magic link
+  - Get key: `https://app.honcho.dev/api-keys` — key format is `hch-v2-...`
+  - New accounts get $100 in free credits; usage-based pricing after that
+- **Honcho plugin install** (run in Claude Code or Desktop — marketplace is shared)
+  - Check if already installed: `ls ~/.claude/plugins/installed/honcho 2>/dev/null`
+  - Install:
     1. `/plugin marketplace add plastic-labs/claude-honcho`
-    2. `/plugin install honcho@honcho`
-    3. `/reload-plugins`
-    4. `/honcho:setup` — enter your Honcho API key (get it from honcho.dev)
-  - Verify: `/honcho:status` returns connected
-  - Note: once configured in Desktop, Claude Code's Honcho plugin reads the same credentials
+    2. `/plugin install honcho@honcho` — **pick `honcho@honcho`, NOT `honcho-dev@honcho`** (honcho-dev is SDK developer tooling, not the memory plugin)
+    3. Fully quit Claude Code (`/exit`) and restart — on boot you should see Honcho pixel art and "memory loading"
+- **Configure API key** (one of two paths — either works)
+  - **Env var path:** add `export HONCHO_API_KEY="hch-v2-..."` to `~/.zshrc`, optionally `HONCHO_PEER_NAME="$USER"` and `HONCHO_WORKSPACE="claude_code"`. Then `source ~/.zshrc` and restart Claude Code.
+  - **Interactive path:** run `/honcho:setup` inside Claude Code — prompts for the key, validates it, writes `~/.honcho/config.json`.
+  - Once `~/.honcho/config.json` exists it takes precedence over env vars.
+- **Verify:** run `/honcho:status` — should return `connected` with workspace and peer ID
+- **Optional bootstrap:** run `/honcho:interview` to capture stable cross-project preferences into your peer profile
+- **Teach Claude to write to memory** (recommended): paste the memory directives block from Part 6 Step 8 of `mac-gsd-manual.md` into the user's `~/.claude/CLAUDE.md` — this enables `create_conclusion` usage mid-session so Claude saves new insights, not just reads old ones
+- **Per-surface note:** plugin install + config are per-surface. Claude Desktop and Cowork each need their own `/plugin install` and key config, but all use the same Honcho account and peer name
 
-**Checkpoint — Phase A:** At this point you have: Homebrew, Node, Bun, Python, git, gh (authenticated), Claude Code (authenticated), Claude Desktop (signed in), Honcho (connected). Don't move to Phase B until all of these pass their verify step.
+**Checkpoint — Phase A:** At this point you have: Homebrew, Node, Bun, Python, git, gh (authenticated), Claude Code (authenticated), Claude Desktop (signed in), Honcho (connected, `/honcho:status` returns connected). Don't move to Phase B until all of these pass their verify step.
 
 ---
 

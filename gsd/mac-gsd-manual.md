@@ -499,7 +499,14 @@ Then type in the Claude Code prompt: "Create a simple hello world HTML file". If
 
 ## Part 6: Claude Desktop + Honcho
 
-Honcho is a Claude Desktop plugin that stores your cross-session preferences and behavioral patterns in the cloud. Install Desktop first, then install Honcho inside it — both Claude Code and Desktop will then read the same credentials.
+Honcho (by Plastic Labs) is a cloud memory service with a Claude plugin that distills your preferences and working patterns across sessions. Claude remembers what you're working on, your preferences, and what it was doing — across every session and every project. The plugin ships through the `plastic-labs/claude-honcho` marketplace and works the same in Claude Code and Claude Desktop. We install it alongside Desktop because Desktop's Profile block is where the distilled memory surfaces most visibly.
+
+> **Heads up — two plugins share the Honcho name. Pick the right one.**
+>
+> - **`honcho`** — the memory plugin. This is what you want. Gives Claude persistent memory across sessions.
+> - **`honcho-dev`** — SDK developer tools for building your own apps against the Honcho API. Skip this unless you're actively coding against the SDK.
+>
+> Both live under the same marketplace (`plastic-labs/claude-honcho`). When you run `/plugin install`, pick `honcho@honcho`, not `honcho-dev@honcho`.
 
 ### Step 1: Install Claude Desktop
 
@@ -511,33 +518,119 @@ Verify:
 ls /Applications/Claude.app
 ```
 
-### Step 2: Install the Honcho plugin
+### Step 2: Install Bun (plugin prerequisite)
 
-Launch Claude Desktop (or Claude Code — either works), then run these commands one at a time:
+The Honcho plugin runs on Bun. If you already installed Bun in Part 3, skip ahead. Otherwise:
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+Then restart your terminal or `source ~/.zshrc` so `bun` is on PATH. Verify:
+
+```bash
+bun --version
+```
+
+### Step 3: Sign up for Honcho and grab your API key
+
+1. Open **https://app.honcho.dev** in a browser.
+2. Sign up. You can use **Google**, **GitHub**, or **email magic link** — whichever you prefer.
+3. Once you're in, go to **https://app.honcho.dev/api-keys**.
+4. Create a new key and copy it. The format is `hch-v2-...` (the `hch-` prefix is how you know it's the right string).
+
+**Pricing:** New accounts get **$100 in free credits**, which covers a lot of solo use before you'd ever pay. After that it's usage-based (memory ingestion charged per million tokens, reasoning queries per query). Startups that have raised under $5M can apply for $1,000 in credits plus 12 months of subsidized pricing — see honcho.dev for the current rate card.
+
+Keep the key somewhere you can paste from. You'll use it in Step 5.
+
+### Step 4: Install the Honcho plugin
+
+You can run these from Claude Code or Claude Desktop — the marketplace is shared. Run them one line at a time, waiting for each to complete:
 
 ```
 /plugin marketplace add plastic-labs/claude-honcho
 /plugin install honcho@honcho
-/reload-plugins
 ```
 
-### Step 3: Configure Your Honcho API Key
+If `/plugin install` lists multiple options, pick `honcho@honcho` — **not** `honcho-dev@honcho`. The package identifier is what matters; the display name may read "Honcho" vs "Honcho dev".
 
-Get your API key from https://honcho.dev (free tier is fine to start). Then inside Claude run:
+**Now fully quit Claude Code and restart it** (`ctrl+c` or `/exit`, then `claude`). Restart is required for the plugin to register.
+
+On successful startup you'll see Honcho pixel art and a "memory loading" line in the Claude Code boot output. That's the signal the plugin is live.
+
+### Step 5: Point the plugin at your API key
+
+The plugin reads from a global config file at `~/.honcho/config.json`. Easiest way to create it:
+
+**Option A — set an environment variable first, let the plugin pick it up:**
+
+Add to `~/.zshrc`:
+
+```bash
+export HONCHO_API_KEY="hch-v2-your-key-from-step-3"
+# Optional — defaults are reasonable
+export HONCHO_PEER_NAME="$USER"         # your identity across projects
+export HONCHO_WORKSPACE="claude_code"   # bucket the memory lives in
+```
+
+Then `source ~/.zshrc` and restart Claude Code again. First run will write `~/.honcho/config.json` from the env vars.
+
+**Option B — run the setup skill:**
+
+Inside Claude Code:
 
 ```
 /honcho:setup
 ```
 
-Paste your API key when prompted.
+This prompts you interactively for the API key, validates it against the Honcho API, and writes `~/.honcho/config.json`. Once the file exists it takes precedence over env vars.
 
-### Step 4: Verify
+Either option works. Pick one. If validation fails, you either pasted the wrong string or the key was revoked — re-copy from `app.honcho.dev/api-keys` and try again.
+
+### Step 6: Verify
+
+Inside Claude Code:
 
 ```
 /honcho:status
 ```
 
-This should return "connected" with your user ID shown. If it fails, check that the API key is correct and that the marketplace plugin was actually installed (run `/plugin list` to confirm).
+Success looks like a "connected" response with your workspace name, peer ID, and account info. If it fails: run `/plugin list` to confirm `honcho@honcho` is actually installed, confirm the config file exists (`cat ~/.honcho/config.json`), then re-run `/honcho:setup` with a fresh key.
+
+### Step 7: (Optional but recommended) Kick off your peer profile with an interview
+
+```
+/honcho:interview
+```
+
+Claude walks you through a short interview about your preferences and working style. What it learns is saved to your peer profile in Honcho and carried across every project from here on. The interview is tied to your peer name (`HONCHO_PEER_NAME`), so one interview covers every surface you set up later.
+
+### Step 8: Teach Claude to actually use the memory
+
+The plugin loads context at session start automatically, but you want Claude to also **save** new things it learns mid-conversation. Add these directives to your personal `~/.claude/CLAUDE.md` (create the file if it doesn't exist). This is the **personal** config — not a project-level CLAUDE.md — because Honcho is about you, and follows you across every repo.
+
+```
+# Honcho Memory
+
+You have persistent memory via Honcho. Context about me, my preferences,
+and our past work is loaded automatically at the start of every session.
+
+## How to use it:
+- Trust the Honcho context injected at session start. It contains what you
+  know about me — act on it. Do not ignore it or ask me things you already know.
+- Use `chat` or `search` mid-conversation when you need context beyond what
+  was loaded at startup.
+- Use `create_conclusion` to save new insights as you learn them: my preferences,
+  decisions, patterns I like, things I've asked you not to do.
+- I should never have to repeat myself. If I've told you something before,
+  you should already know it.
+```
+
+Save the file. From now on, Claude will both read and write to Honcho as you work.
+
+### Step 9: Install in your other Claude surfaces
+
+Plugin install + config is per-surface but the **account** is shared. If you also use Claude Desktop (or Cowork), open that surface and repeat Steps 4–6 there — same marketplace command, same key, same peer name. One Honcho account feeds every surface you're on.
 
 > **WHY HONCHO COMES BEFORE OBSIDIAN**
 >
