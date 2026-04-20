@@ -149,6 +149,7 @@ Honcho (by Plastic Labs) is the cross-session memory plugin. Same marketplace in
 - **Configure API key** (one of two paths — either works)
   - **Env var path:** add `export HONCHO_API_KEY="hch-v2-..."` to `~/.zshrc`, optionally `HONCHO_PEER_NAME="$USER"` and `HONCHO_WORKSPACE="claude_code"`. Then `source ~/.zshrc` and restart Claude Code.
   - **Interactive path:** run `/honcho:setup` inside Claude Code — prompts for the key, validates it, writes `~/.honcho/config.json`.
+  - **Note:** if `~/.honcho/config.json` already exists (prior install), the plugin will reuse it; skip `/honcho:setup`. Verify with `/honcho:status`.
   - Once `~/.honcho/config.json` exists it takes precedence over env vars.
 - **Verify:** run `/honcho:status` — should return `connected` with workspace and peer ID
 - **Optional bootstrap:** run `/honcho:interview` to capture stable cross-project preferences into your peer profile

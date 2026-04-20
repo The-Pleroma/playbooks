@@ -585,6 +585,8 @@ Inside Claude Code:
 
 This prompts you interactively for the API key, validates it against the Honcho API, and writes `~/.honcho/config.json`. Once the file exists it takes precedence over env vars.
 
+> **If you already have a Honcho install with API key:** the plugin auto-detects your existing `~/.honcho/config.json` and reuses it — `/honcho:setup` is not needed. Verify with `/honcho:status` either way to confirm the config is valid and the API key still works.
+
 Either option works. Pick one. If validation fails, you either pasted the wrong string or the key was revoked — re-copy from `app.honcho.dev/api-keys` and try again.
 
 ### Step 6: Verify
