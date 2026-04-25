@@ -245,10 +245,12 @@ Register MCPs at `--scope user` so both Claude Code and Claude Desktop see them.
 
 This is the canonical installer for the Atlas memory layer. It scaffolds `6-AI-Memory/` in your vault, symlinks the `vault-session` and `vault-closeday` skills into `~/.claude/skills/`, installs the PostToolUse Obsidian MCP logger hook, installs the Honcho nightly launchd plist, and prints three paste-in templates (Desktop Profile, Cowork Global, Claude Code CLAUDE.md).
 
+SBB actually ships three modules under one installer — `memory` (the scaffold above), `obsidian` (a local `@second-brain-bridge/obsidian-mcp` server with 21 tools + four `vault-*` skills that work offline and in CoWork), and `iwork` (Pages/Numbers/Keynote wrappers around upstream `iwork-mcp`). Default install wires all three; pass `--module memory|obsidian|iwork` for a subset.
+
 ```bash
 git clone https://github.com/Seph396/second-brain-bridge ~/Developer/second-brain-bridge
 cd ~/Developer/second-brain-bridge
-./bin/install.sh --vault-root "$HOME/Documents/MyVault"
+./bin/install.sh --all --vault-root "$HOME/Documents/MyVault"
 ```
 
 (Replace `MyVault` with your actual vault name. For Seph: `$HOME/Documents/The_Pleroma`.)
@@ -268,7 +270,10 @@ ls "$HOME/Documents/MyVault/6-AI-Memory/"  # should show Daily/, _sessions/, Hon
 ls ~/.claude/skills/vault-session/        # should be a symlink
 ls ~/.claude/skills/vault-closeday/       # should be a symlink
 launchctl list | grep honcho              # should show the nightly launchd job
+./bin/test.sh                             # optional — 5/5 suites pass (sanitize, memory, obsidian, iwork, mcp-ts)
 ```
+
+**If you're installing SBB as a trusted tester** (someone the maintainer explicitly invited to validate the install before public release), log friction as you go in `.planning/trusted-install-feedback.md` inside the repo. Each discrete issue = one row. Severity tiers: `Blocker` (couldn't continue), `Annoyance` (worked around), `Cosmetic` (typo). Phase 4 closes when ≥1 tester reports `Clean? = Yes` for the full install with zero open Blockers. See the SBB repo's `README.md → For trusted testers` section and the feedback-log's own column guide for exact format. Push a branch with your rows filled in, or paste them back to the maintainer in a message.
 
 ### B.4 graphify — knowledge graph over the vault
 

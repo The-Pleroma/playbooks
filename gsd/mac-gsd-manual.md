@@ -822,14 +822,20 @@ Before v1.2.0 of this manual, each of those pieces got installed by hand. That's
 ```bash
 git clone https://github.com/Seph396/second-brain-bridge ~/Developer/second-brain-bridge
 cd ~/Developer/second-brain-bridge
-./bin/install.sh --vault-root "$HOME/Documents/MyVault"
+./bin/install.sh --all --vault-root "$HOME/Documents/MyVault"
 ```
 
 Replace `MyVault` with your actual vault name. For Seph: `$HOME/Documents/The_Pleroma`.
 
+The `--all` flag installs all three SBB modules at once: `memory` (the vault scaffold + `vault-session` + `vault-closeday` + nightly Honcho plist — what this part of the manual focuses on), `obsidian` (a local `obsidian-sbb` MCP server with 21 tools plus the four `vault-*` skills — works offline and inside CoWork, unlike the community Obsidian MCP from Part 8), and `iwork` (Pages/Numbers/Keynote wrappers around upstream `iwork-mcp`, macOS-only). If you only want a subset, pass `--module memory`, `--module obsidian`, or `--module iwork`. Re-running the installer is always safe — idempotent with timestamped backups before any destructive step.
+
 > **REPO VISIBILITY**
 >
 > As of April 2026 the repo is private. If the clone fails with "repository not found", you need to be invited as a collaborator, or wait for the public release. When it goes public, update this command to use the public URL.
+
+> **TRUSTED TESTERS — PRE-RELEASE VALIDATION**
+>
+> If the maintainer explicitly invited you to install SBB as part of pre-public-release validation, log friction as you go in `.planning/trusted-install-feedback.md` inside the repo. Each discrete issue = one row. Severity tiers: `Blocker` (couldn't continue), `Annoyance` (worked around), `Cosmetic` (typo/unclear phrasing). Observations matter more than proposed fixes. Phase 4 closes when ≥1 tester reports `Clean? = Yes` for the full install with zero open Blockers. Full format in the feedback-log's own column guide; full loop in the SBB repo's `README.md → For trusted testers` section. When you're done — whether the install worked or not — push a branch with your rows filled in, or paste them back to the maintainer.
 
 ### Step 2: Paste the Three Templates
 
